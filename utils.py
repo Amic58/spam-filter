@@ -25,7 +25,7 @@ def read_classification_from_file(file_name):
 
 
 def html_clean(word):
-    return word.replace("<br>", "").replace("</br>", "").strip(['<', '>'])
+    return str(word).replace("<br>", "").replace("</br>", "").strip('<').strip('>')
 
 
 def is_empty(any_structure):

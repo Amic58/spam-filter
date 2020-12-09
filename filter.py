@@ -4,10 +4,12 @@
     Created on 10. 10. 2020
     Last change on 11. 11. 2020
 """
-import basefilter_new
+import basefilter
+import utils
+from os import sep
 
 
-class MyFilter(basefilter_new.BaseFilter):
+class MyFilter(basefilter.BaseFilter):
     def __init__(self):
         super().__init__()
         self.prediction_file_name = "!prediction.txt"
@@ -19,7 +21,7 @@ class MyFilter(basefilter_new.BaseFilter):
     def train(self, path):
         from trainingcorpus import TrainingCorpus
 
-        training_corpus = TrainingCorpus()
+        training_corpus = TrainingCorpus(path)
         spam_dict = {}
         ham_dict = {}
 
@@ -50,15 +52,13 @@ class MyFilter(basefilter_new.BaseFilter):
             self.train_on_text(body, eval_dict, spam)
 
     def train_on_text(self, text, eval_dict, spam=False):
-        from utils import html_clean
-
         sender_flag = False
         words = text.split()
         # evaluate all words
         for word in words:
             # sort out html like keywords
             if word.startswith("<") and word.endswith(">") or '@' in word:
-                html_clean(word)
+                utils.html_clean(word)
             if word == "":
                 continue
 
@@ -91,19 +91,33 @@ class MyFilter(basefilter_new.BaseFilter):
 
             self.append_result_dict(prediction, spam_index, name)
 
-        with open(path + "!prediction", "w", encoding="utf-8") as fw:
+        with open(path + sep + "!prediction.txt", "w", encoding="utf-8") as fw:
             for name, pred in prediction:
                 fw.write(f"{name} {pred}\n")
 
     def append_result_dict(self, prediction: list, spam_index, file_name):
         if spam_index >= 0:
-            prediction.append((file_name, "SPAM"))
+            prediction.append((file_name, utils.SPAM_TAG))
         else:
-            prediction.append((file_name, "OK"))
+            prediction.append((file_name, utils.HAM_TAG))
 
     def evaluate_mail(self, words):
-        from utils import html_clean
+        # if MyFilter not trained
+        res = tuple()
 
+        if self.spam_word_freq == {}:
+            res = self.evaluate_mail_not_trained(words)
+        else:
+            res = self.evaluate_mail_trained(words)
+
+        return res
+
+    def evaluate_mail_not_trained(self, words):
+        from random import choice
+
+        return len(words) * choice([-1, 1]), choice([True, False])
+
+    def evaluate_mail_trained(self, words):
         sender_flag = False
         spam_sender_flag = False
         spam_score = 0
@@ -111,12 +125,12 @@ class MyFilter(basefilter_new.BaseFilter):
         for word in words:
             # sort out html like keywords
             if word.startswith("<") and word.endswith(">") or '@' in word:
-                html_clean(word)
+                utils.html_clean(word)
             if word == "":
                 continue
 
-            if word in self.spam_dict:
-                spam_score += self.spam_dict[word]
+            if word in self.spam_word_freq:
+                spam_score += self.spam_word_freq[word]
                 continue
 
             # save sender
@@ -129,5 +143,4 @@ class MyFilter(basefilter_new.BaseFilter):
             if word == "From:":
                 sender_flag = True
                 continue
-
         return spam_score, spam_sender_flag
