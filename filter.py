@@ -81,6 +81,7 @@ class MyFilter(basefilter.BaseFilter):
         words = text.split()
         # evaluate all words
         for word in words:
+            word.lower()
             # sort out html like keywords
             if word.startswith("<") and word.endswith(">") or '@' in word:
                 utils.html_clean(word)
@@ -160,6 +161,7 @@ class MyFilter(basefilter.BaseFilter):
         spam_score = 0
         # evaluate all words
         for word in words:
+            word.lower()
             # sort out html like keywords
             if word.startswith("<") and word.endswith(">") or '@' in word:
                 utils.html_clean(word)
