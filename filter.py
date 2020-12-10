@@ -2,7 +2,7 @@
     Author: David Otta
     Created for: B4B33RPH
     Created on 10. 10. 2020
-    Last change on 11. 11. 2020
+    Last change on 10. 12. 2020
 """
 import basefilter
 import utils
@@ -15,10 +15,15 @@ class MyFilter(basefilter.BaseFilter):
         self.prediction_file_name = "!prediction.txt"
         self.spam_word_freq = {}
         self.spam_senders = []
-        self.border_value = 0
-        self.spam_sender_multiplier = 3
+        self.border_value = 200
+        self.spam_sender_multiplier = 5
 
     def train(self, path):
+        """
+        Trains filter on given data.
+        :param path: directory with
+        :return: no return
+        """
         from trainingcorpus import TrainingCorpus
 
         training_corpus = TrainingCorpus(path)
@@ -33,6 +38,12 @@ class MyFilter(basefilter.BaseFilter):
         self.spam_word_freq = dict_diff
 
     def create_testing_spam_dict(self, ham_dict, spam_dict):
+        """
+        Combines dictionaries with spam words and ham words
+        :param ham_dict: dictionary with ham word frequencies
+        :param spam_dict: dictionary with spam word frequencies
+        :return: dictionary with difference of spam and ham dictionaries
+        """
         spam_ham_diff = {}
         # create spam dictionary for testing
         for key in spam_dict:
@@ -48,10 +59,24 @@ class MyFilter(basefilter.BaseFilter):
         return spam_ham_diff
 
     def train_on_group(self, get_emails, eval_dict, spam=False):
+        """
+        Trains on single emails.
+        :param get_emails: generator function
+        :param eval_dict: dict to store training results
+        :param spam: are we training on spam
+        :return: no return
+        """
         for name, body in get_emails():
             self.train_on_text(body, eval_dict, spam)
 
     def train_on_text(self, text, eval_dict, spam=False):
+        """
+        Train on text of an email.
+        :param text: text of an email
+        :param eval_dict: dict to store results in
+        :param spam: is it spam
+        :return: no return
+        """
         sender_flag = False
         words = text.split()
         # evaluate all words
@@ -91,17 +116,29 @@ class MyFilter(basefilter.BaseFilter):
 
             self.append_result_dict(prediction, spam_index, name)
 
-        with open(path + sep + "!prediction.txt", "w", encoding="utf-8") as fw:
+        with open(path + sep + self.prediction_file_name, "w", encoding="utf-8") as fw:
             for name, pred in prediction:
                 fw.write(f"{name} {pred}\n")
 
     def append_result_dict(self, prediction: list, spam_index, file_name):
+        """
+        Append dictionary with results.
+        :param prediction: list of predictions
+        :param spam_index: number, that desceibes how spammness of a file
+        :param file_name: name of the file
+        :return:
+        """
         if spam_index >= 0:
             prediction.append((file_name, utils.SPAM_TAG))
         else:
             prediction.append((file_name, utils.HAM_TAG))
 
     def evaluate_mail(self, words):
+        """
+        Run evaluation based on whether it was trained on not.
+        :param words: list of all words in an email
+        :return: evaluation result
+        """
         # if MyFilter not trained
         res = tuple()
 
