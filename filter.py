@@ -15,7 +15,7 @@ class MyFilter(basefilter.BaseFilter):
         self.prediction_file_name = "!prediction.txt"
         self.spam_word_freq = {}
         self.spam_senders = []
-        self.border_value = 200
+        self.border_value = 5000
         self.spam_sender_multiplier = 5
 
     def train(self, path):
@@ -129,7 +129,7 @@ class MyFilter(basefilter.BaseFilter):
         :param file_name: name of the file
         :return:
         """
-        if spam_index >= 0:
+        if spam_index >= self.border_value:
             prediction.append((file_name, utils.SPAM_TAG))
         else:
             prediction.append((file_name, utils.HAM_TAG))
