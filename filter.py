@@ -15,7 +15,7 @@ class MyFilter(basefilter.BaseFilter):
         self.prediction_file_name = "!prediction.txt"
         self.spam_word_freq = {}
         self.spam_senders = []
-        self.border_value = 10000
+        self.border_value = 5000
         self.spam_sender_multiplier = 5
 
     def train(self, path):
