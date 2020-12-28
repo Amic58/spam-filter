@@ -2,7 +2,7 @@
     Author: David Otta
     Created for: B4B33RPH
     Created on 10. 10. 2020
-    Last change on 10. 12. 2020
+    Last change on 28. 12. 2020
 """
 import basefilter
 import utils
@@ -15,7 +15,7 @@ class MyFilter(basefilter.BaseFilter):
         self.prediction_file_name = "!prediction.txt"
         self.spam_word_freq = {}
         self.spam_senders = []
-        self.border_value = 5000
+        self.border_value = 20000
         self.spam_sender_multiplier = 5
 
     def train(self, path):
