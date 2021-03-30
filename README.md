@@ -6,7 +6,7 @@ Team project for Solving Problems and other Games course at Czech Technical Univ
 
 https://cw.fel.cvut.cz/wiki/courses/b4b33rph/cviceni/spam/start
 
-## Disclaimer for CTU students
+## Information for CTU students
 
 This code is openly available to be studied to get an idea of how a simple spam filter might work.
 
